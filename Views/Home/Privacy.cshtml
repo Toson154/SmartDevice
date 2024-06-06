@@ -1,0 +1,65 @@
+﻿<div class="container-fluid">
+    <div>
+        <label for="categoryDropdown">Select a category:</label>
+        @Html.DropDownList("categoryId", ViewBag.Categories as SelectList, "All", new { id = "categoryDropdown" })
+
+        <label for="searchInput">Search by name:</label>
+        <input type="text" id="searchInput" value="@ViewBag.SearchName" />
+
+        <button id="applyFiltersButton">Apply Filters</button>
+    </div>
+
+    <div id="devicesList" class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var device in Model)
+        {
+            <div class="col mb-3">
+                <div class="card deviceItem" data-deviceName="@device.Name" data-categoryId="@device.CategoryId">
+                    <img src="~/images/@device.DeviceImage" class="card-img-top" alt="@device.Name">
+                    <div class="card-body">
+                        <h5 class="card-title">@device.Name</h5>
+                        <p class="card-text">Price: $@device.Price</p>
+                        <!-- Add any other device details as needed -->
+                    </div>
+                    <div class="card-footer">
+                        <p>More details</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#searchInput").on("input", function () {
+            applyFilters();
+        });
+
+        $("#categoryDropdown").change(function () {
+            applyFilters();
+        });
+
+        function applyFilters() {
+            var searchName = $("#searchInput").val().toLowerCase();
+            var categoryId = $("#categoryDropdown").val();
+            console.log("Search Name:", searchName);
+            console.log("Category ID:", categoryId);
+
+            // Hide all items initially
+            $(".deviceItem").hide();
+
+            // Show items that match the search name and selected category
+            $(".deviceItem").each(function () {
+                var deviceName = $(this).data("devicename").toLowerCase();
+                var deviceCategoryId = $(this).data("categoryid");
+
+                var nameMatches = deviceName.includes(searchName);
+
+                if (nameMatches && (categoryId === '' || deviceCategoryId == categoryId)) {
+                    $(this).show();
+                }
+            });
+        }
+    });
+</script>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<Devices_E_Commerce.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+<h1>Categories</h1>
+
+<div class="container-fluid">
+    <div>
+        <label for="searchInput">Search by name:</label>
+        <input type="text" id="searchInput" value="@ViewBag.SearchName" />
+
+        <button id="applyFiltersButton">Apply Filters</button>
+    </div>
+
+    <div id="devicesList" class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var category in Model)
+        {
+            <div class="col mb-3">
+                <a asp-action="Products" asp-route-categoryId="@category.Id" class="card-link">
+                    <div class="card">
+                        <img src="~/images/@category.Image" class="card-img-top" alt="@category.Name">
+                        <div class="card-body">
+                            <h5 class="card-title">@category.Name</h5>
+                            <p class="card-text">@category.Details</p>
+                            <!-- Add any other category details as needed -->
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#searchInput").on("input", function () {
+            applyFilters();
+        });
+
+        function applyFilters() {
+            var searchName = $("#searchInput").val().toLowerCase();
+            console.log("Search Name:", searchName);
+
+            // Hide all items initially
+            $(".col.mb-3").hide();
+
+            // Show items that match the search name
+            $(".col.mb-3").each(function () {
+                var deviceName = $(this).find(".card-title").text().toLowerCase();
+
+                var nameMatches = deviceName.includes(searchName);
+
+                if (nameMatches) {
+                    $(this).show();
+                }
+            });
+        }
+    });
+</script>

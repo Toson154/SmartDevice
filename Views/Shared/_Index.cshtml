@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- Add this line to include Bootstrap CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYxwymuM4yfMPUv4U9OV2qYPeIqYZO4l9zFqW7IlG4d3v8x1hAqV8E/IJyD9" crossorigin="anonymous">
+
+    <title>Your Website Title</title>
+    <link rel="stylesheet" href="~/css/layout.css" />
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Your Brand</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Account/Products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Categories</a>
+                    </li>
+                </ul>
+
+                <!-- Shopping Cart -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="cartLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Cart <span id="cartItemCount" class="badge bg-secondary">0</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="cartLink" id="cartDropdown">
+                            <!-- Cart items will be displayed here -->
+                        </div>
+                    </li>
+                </ul>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a>
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Shopping Cart</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="cartItemsContainer">
+                    <!-- Cart items will be displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        @RenderBody()
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-fz9s5o9Sc9s/yFi5z5P1yP00v5s/BZbH8ah2s/r3b3AAd/6e9qGV3vGqoCrNBp/p" crossorigin="anonymous"></script>
+    <script>
+        // Function to update the content of the cart modal
+        function updateCartModal() {
+            var cart = JSON.parse(localStorage.getItem("cart")) || [];
+            var cartItemsContainer = $("#cartItemsContainer");
+            cartItemsContainer.empty();
+
+            if (cart.length > 0) {
+                // Display each item in the cart
+                $.each(cart, function (index, item) {
+                    var itemName = getItemNameById(item.productId);
+                    cartItemsContainer.append("<p>" + itemName + " - Quantity: " + item.quantity + "</p>");
+                });
+            } else {
+                // Display a message if the cart is empty
+                cartItemsContainer.append("<p>Your cart is empty.</p>");
+            }
+        }
+
+        // Function to update the content of the cart dropdown
+        function updateCartDropdown() {
+            var cart = JSON.parse(localStorage.getItem("cart")) || [];
+            var cartDropdown = $("#cartDropdown");
+            cartDropdown.empty();
+
+            if (cart.length > 0) {
+                // Display each item in the cart
+                $.each(cart, function (index, item) {
+                    var itemName = getItemNameById(item.productId);
+                    cartDropdown.append("<a class='dropdown-item' href='#'>" + itemName + " - Quantity: " + item.quantity + "</a>");
+                });
+            } else {
+                // Display a message if the cart is empty
+                cartDropdown.append("<p class='dropdown-item'>Your cart is empty.</p>");
+            }
+        }
+
+        // Function to get the name of an item by its ID
+        function getItemNameById(productId) {
+            // Implement logic to retrieve the product name based on productId
+            // This could involve an AJAX request to the server
+            // For now, let's assume the product name is known
+            return "Product " + productId;
+        }
+
+        // Add this script to handle opening the cart modal when the "Cart" link is clicked
+        $(document).ready(function () {
+            $("#cartLink").on("click", function (e) {
+                // Prevent the default behavior of the link
+                e.preventDefault();
+
+                // Update the cart items in the modal before showing it
+                updateCartModal();
+                $("#cartModal").modal("show");
+            });
+
+            // Add this script to handle updating the cart dropdown when the "Cart" link is clicked
+            $(".dropdown-toggle").on("click", function (e) {
+                // Prevent the default behavior of the link
+                e.preventDefault();
+
+                // Update the cart items in the dropdown before showing it
+                updateCartDropdown();
+            });
+        });
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

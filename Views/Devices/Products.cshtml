@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Devices_E_Commerce.Models.Device>
+
+@{
+    ViewData["Title"] = "Products";
+}
+<h1>Products</h1>
+
+<div class="container-fluid">
+    <div id="productsList" class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var product in Model)
+        {
+            <div class="col mb-3 productItem" data-productid="@product.Id">
+                <a asp-controller="Devices" asp-action="ProductDetails" asp-route-productId="@product.Id" class="card-link">
+                    <div class="card">
+                        <img src="~/images/@product.DeviceImage" class="card-img-top" alt="@product.Name">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">Price: $@product.Price</p>
+                            <!-- Add any other product details as needed -->
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+@*        $(".productItem a.card-link").on("click", function (e) {
+            // Prevent the default behavior of the link
+            e.preventDefault();
+
+            // Retrieve the product ID from the clicked card
+            var productId = $(this).closest(".productItem").data("productid");
+
+            // Redirect to the ProductDetails action with the product ID as a parameter
+            window.location.href = "/YourControllerName/ProductDetails/" + productId;
+        });*@
+
+        $("#searchInput").on("input", function () {
+            applyFilters();
+        });
+
+        function applyFilters() {
+            var searchName = $("#searchInput").val().toLowerCase();
+            console.log("Search Name:", searchName);
+
+            // Hide all items initially
+            $(".productItem").hide();
+
+            // Show items that match the search name
+            $(".productItem").each(function () {
+                var productName = $(this).find(".card-title").text().toLowerCase();
+
+                var nameMatches = productName.includes(searchName);
+
+                if (nameMatches) {
+                    $(this).show();
+                }
+            });
+        }
+    });
+</script>

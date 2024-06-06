@@ -1,0 +1,132 @@
+﻿@model Devices_E_Commerce.Models.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<h1>Product Details</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="~/images/@Model.Product.DeviceImage" class="img-fluid" alt="@Model.Product.Name">
+        </div>
+        <div class="col-md-6">
+            <h2>@Model.Product.Name</h2>
+            <p>Price: $@Model.Product.Price</p>
+            <p>Details: @Model.Product.DeviceImage</p>
+
+            <!-- Add to Cart button -->
+            <button class="btn btn-primary" onclick="addToCart(@Model.Product.Id, '@Model.Product.Name', '@Model.Product.DeviceImage', @Model.Product.Price)">Add to Cart</button>
+        </div>
+    </div>
+
+    <hr />
+
+    <h2>Related Products</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var relatedProduct in Model.RelatedProducts)
+        {
+            <div class="col mb-3">
+                <div class="card">
+                    <img src="~/images/@relatedProduct.DeviceImage" class="card-img-top" alt="@relatedProduct.Name">
+                    <div class="card-body">
+                        <h5 class="card-title">@relatedProduct.Name</h5>
+                        <p class="card-text">Price: $@relatedProduct.Price</p>
+                        <!-- Add any other related product details as needed -->
+                        <!-- Add to Cart button for related products -->
+                        <button class="btn btn-primary" onclick="addToCart(@relatedProduct.Id, '@relatedProduct.Name', '@relatedProduct.DeviceImage', @relatedProduct.Price)">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Cart Section -->
+<section id="cartSection" class="container mt-4">
+    <h2>Your Cart</h2>
+    <div id="cartItems" class="row row-cols-1 row-cols-md-2 g-4"></div>
+</section>
+
+@section scripts {
+    <script>
+        // Function to add an item to the cart
+        function addToCart(productId, name, image, price) {
+            // Get the current cart from localStorage
+            var cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // Check if the item is already in the cart
+            var existingItem = cart.find(item => item.productId === productId);
+
+            if (existingItem) {
+                // If the item is already in the cart, update the quantity
+                existingItem.quantity++;
+            } else {
+                // If the item is not in the cart, add it
+                cart.push({
+                    productId: productId,
+                    name: name,
+                    image: image,
+                    price: price,
+                    quantity: 1
+                });
+            }
+
+            // Save the updated cart to localStorage
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            // Update the cart section
+            updateCartSection();
+        }
+
+        // Function to update the cart section
+        function updateCartSection() {
+            // Get the current cart from localStorage
+            var cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // Display the cart information in the cart section
+            var cartItemsDiv = $("#cartItems");
+            cartItemsDiv.empty();
+
+            cart.forEach(function (cartItem) {
+                var cartItemHtml = `
+                            <div class="col mb-4">
+                                <div class="card">
+                                    <img src="${cartItem.image}" class="card-img-top" alt="${cartItem.name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${cartItem.name}</h5>
+                                        <p class="card-text">Quantity: ${cartItem.quantity}</p>
+                                        <p class="card-text">Price: $${cartItem.price}</p>
+                                        <button class="btn btn-danger" onclick="removeCartItem(${cartItem.productId})">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                cartItemsDiv.append(cartItemHtml);
+            });
+
+            // Scroll to the cart section
+            $("html, body").animate({
+                scrollTop: $("#cartSection").offset().top
+            }, 500);
+        }
+
+        // Function to remove a cart item
+        window.removeCartItem = function (productId) {
+            // Get the current cart from localStorage
+            var cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+            // Remove the item from the cart
+            var updatedCart = cart.filter(item => item.productId !== productId);
+
+            // Save the updated cart to localStorage
+            localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+            // Update the cart section
+            updateCartSection();
+        };
+    </script>
+}
