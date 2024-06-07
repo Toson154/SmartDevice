@@ -1,4 +1,4 @@
-# Devices E-Commerce Website
+# Devices E-Commerce Website(not completed yet)
 
 This is an ASP.NET Core MVC project for an e-commerce website selling various electronic devices such as computers, freezers, TVs, etc. The project includes user registration and login functionality without using ASP.NET Identity.
 
